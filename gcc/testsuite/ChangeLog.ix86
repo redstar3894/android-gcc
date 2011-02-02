@@ -1,0 +1,56 @@
+2010-08-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from mainline
+	2010-02-26  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR testsuite/37074:
+	* gcc.dg/torture/stackalign/stackalign.exp: Add -mno-mmx to x86.
+
+2010-06-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from mainline
+	2010-06-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/44615
+	* gcc.target/i386/sse2-vec-2a.c: New.
+
+2009-10-30  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from mainline:
+	2009-10-30  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/40838
+	* gcc.target/i386/incoming-6.c: New.
+	* gcc.target/i386/incoming-7.c: Likewise.
+	* gcc.target/i386/incoming-8.c: Likewise.
+	* gcc.target/i386/incoming-9.c: Likewise.
+	* gcc.target/i386/incoming-10.c: Likewise.
+	* gcc.target/i386/incoming-11.c: Likewise.
+	* gcc.target/i386/incoming-12.c: Likewise.
+	* gcc.target/i386/incoming-13.c: Likewise.
+	* gcc.target/i386/incoming-14.c: Likewise.
+	* gcc.target/i386/incoming-15.c: Likewise.
+	* gcc.target/i386/pr37843-4.c: Likewise.
+
+2009-05-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from mainline:
+	2009-05-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* gcc.target/i386/movbe-1.c: New.
+	* gcc.target/i386/movbe-2.c: Likewise.
+
+2009-03-27  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from mainline:
+	2009-03-27  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR target/39472
+	* gcc.target/x86_64/abi/callabi/func-2a.c: New.
+	* gcc.target/x86_64/abi/callabi/func-2b.c: Likewise.
+	* gcc.target/x86_64/abi/callabi/func-indirect-2a.c: Likewise.
+	* gcc.target/x86_64/abi/callabi/func-indirect-2b.c: Likewise.
+	* gcc.target/x86_64/abi/callabi/vaarg-4a.c: Likewise.
+	* gcc.target/x86_64/abi/callabi/vaarg-4b.c: Likewise.
+	* gcc.target/x86_64/abi/callabi/vaarg-5a.c: Likewise.
+	* gcc.target/x86_64/abi/callabi/vaarg-5b.c: Likewise.
