@@ -1428,6 +1428,16 @@ choose_best_reg_1 (HARD_REG_SET hard_regs_used,
                                   0, cur_reg, hrsi)
     if (! TEST_HARD_REG_BIT (hard_regs_used, cur_reg))
       {
+	/* Check that all hard regs for mode are available.  */
+	for (i = 1, n = hard_regno_nregs[cur_reg][mode]; i < n; i++)
+	  if (TEST_HARD_REG_BIT (hard_regs_used, cur_reg + i)
+	      || !TEST_HARD_REG_BIT (reg_rename_p->available_for_renaming,
+				     cur_reg + i))
+	    break;
+
+	if (i < n)
+	  continue;
+
         /* All hard registers are available.  */
         if (best_new_reg < 0
             || reg_rename_tick[cur_reg] < reg_rename_tick[best_new_reg])
@@ -1459,6 +1469,7 @@ choose_best_reg (HARD_REG_SET hard_regs_used, struct reg_rename *reg_rename_p,
   rtx best_reg = choose_best_reg_1 (hard_regs_used, reg_rename_p, 
                                     original_insns, is_orig_reg_p_ptr);
 
+  /* FIXME loop over hard_regno_nregs here.  */
   gcc_assert (best_reg == NULL_RTX
 	      || TEST_HARD_REG_BIT (sel_hrd.regs_ever_used, REGNO (best_reg)));
 
@@ -2678,8 +2689,7 @@ compute_av_set_at_bb_end (insn_t insn, ilist_t p, int ws)
                                VEC_index (int, sinfo->probs_ok, is), 
                                sinfo->all_prob);
 
-      if (sinfo->all_succs_n > 1 
-          && sinfo->all_succs_n == sinfo->succs_ok_n)
+      if (sinfo->all_succs_n > 1)
 	{
           /* Find EXPR'es that came from *all* successors and save them 
              into expr_in_all_succ_branches.  This set will be used later
@@ -5572,14 +5582,19 @@ maybe_emit_renaming_copy (rtx insn,
                           moveop_static_params_p params)
 {
   bool insn_emitted  = false;
-  rtx cur_reg = expr_dest_reg (params->c_expr);
+  rtx cur_reg;
 
-  gcc_assert (!cur_reg || (params->dest && REG_P (params->dest)));
+  /* Bail out early when expression can not be renamed at all.  */
+  if (!EXPR_SEPARABLE_P (params->c_expr))
+    return false;
+
+  cur_reg = expr_dest_reg (params->c_expr);
+  gcc_assert (cur_reg && params->dest && REG_P (params->dest));
 
   /* If original operation has expr and the register chosen for
      that expr is not original operation's dest reg, substitute
      operation's right hand side with the register chosen.  */
-  if (cur_reg != NULL_RTX && REGNO (params->dest) != REGNO (cur_reg))
+  if (REGNO (params->dest) != REGNO (cur_reg))
     {
       insn_t reg_move_insn, reg_move_insn_rtx;
       
