@@ -1602,6 +1602,10 @@ xstormy16_asm_init_sections (void)
     = get_unnamed_section (SECTION_WRITE | SECTION_BSS,
 			   output_section_asm_op,
 			   "\t.section \".bss_below100\",\"aw\",@nobits");
+
+#ifdef NO_CTORS_DTORS_SECTIONS
+  elf_initfini_array_init_sections ();
+#endif
 }
 
 /* Mark symbols with the "below100" attribute so that we can use the

@@ -351,26 +351,6 @@ else
 fi
 fi])
 
-AC_DEFUN([gcc_AC_INITFINI_ARRAY],
-[AC_ARG_ENABLE(initfini-array,
-	[  --enable-initfini-array	use .init_array/.fini_array sections],
-	[], [
-AC_CACHE_CHECK(for .preinit_array/.init_array/.fini_array support,
-		 gcc_cv_initfini_array, [dnl
-  AC_RUN_IFELSE([AC_LANG_SOURCE([
-static int x = -1;
-int main (void) { return x; }
-int foo (void) { x = 0; }
-int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;])],
-	     [gcc_cv_initfini_array=yes], [gcc_cv_initfini_array=no],
-	     [gcc_cv_initfini_array=no])])
-  enable_initfini_array=$gcc_cv_initfini_array
-])
-if test $enable_initfini_array = yes; then
-  AC_DEFINE(HAVE_INITFINI_ARRAY, 1,
-    [Define .init_array/.fini_array sections are available and working.])
-fi])
-
 dnl # _gcc_COMPUTE_GAS_VERSION
 dnl # Used by gcc_GAS_VERSION_GTE_IFELSE
 dnl #

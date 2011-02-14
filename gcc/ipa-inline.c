@@ -1375,9 +1375,9 @@ cgraph_edge_priority (struct cgraph_edge *edge)
     priority = 0;
   else
     {
-      /* FREQ_DIVISOR is some estimate of the frequency of the
-	 callsite.  The value can range from 0 to 1.0.  */
-      double freq_divisor;
+      /* FREQ_DIVISOR is an estimate of the relative frequency of the
+	 callsite.  The value can range from 0 to CGRAPH_FREQ_MAX.  */
+      int freq_divisor;
 
       if (max_count)
 	{
@@ -1390,38 +1390,42 @@ cgraph_edge_priority (struct cgraph_edge *edge)
 	      && get_total_count_edge (edge, cgraph_node_name (caller)) > 0)
 	    /* When using sample profile, if the function is inlined during the
 	       profiling run, we will give it higher priority to be inlined.  */
-	    freq_divisor = 1.0;
+	    freq_divisor = CGRAPH_FREQ_MAX;
 	  else
-	    freq_divisor = (double)edge->count / max_count;
+            freq_divisor = ((long long) edge->count * CGRAPH_FREQ_MAX
+                            + max_count / 2) / max_count;
 	}
       else if (flag_guess_branch_prob)
-	/* When function local profile is available, base priorities on
-	   estimated frequency, so we optimize for overall frequency of
-	   inlined calls.  This is not too accurate since while the call
-	   might be frequent within function, the function itself is
-	   infrequent.  */
-	freq_divisor = (double)edge->frequency / CGRAPH_FREQ_MAX;
+	/* When function local profile is available, base priorities
+	   on estimated frequency, so we optimize for overall
+	   frequency of inlined calls.  This is not too accurate
+	   since while the call might be frequent within function,
+	   the function itself is infrequent.  */
+	freq_divisor = edge->frequency;
       else
 	{
-	  /* When function local profile is not available or it does not
-	     give useful information (ie frequency is zero), base the
-	     frequency upon the loop nest where each loop is estimated to
-	     be executed twice.  The nest depth is capped at a
-	     constant so the maximum FREQ_DIVISOR value is 1.0.  */
+	  /* When function local profile is not available or it does
+	     not give useful information (ie frequency is zero), base
+	     the frequency upon the loop nest where each loop is
+	     estimated to be executed twice.  The nest depth is capped
+	     at 8.  */
 	  int nest = MIN (edge->loop_nest, 8);
-	  freq_divisor = 1.0 / (1 << (8 - nest));
+	  freq_divisor = CGRAPH_FREQ_MAX / (1 << (8 - nest));
 	}
-
-      if ((freq_divisor <= 0.0)
-	  || (growth / freq_divisor > INT_MAX - 1))
-	/* Limit priority to one less than INT_MAX to leave room for
-	   incrementing priority due to recursive inlining below.  */
-	priority = INT_MAX - 1;
+      if (freq_divisor <= 0)
+	priority = INT_MAX;
       else
-	priority = (int) (growth / freq_divisor);
-
+        {
+          int priority_ll = (((long long) growth * CGRAPH_FREQ_MAX)
+                             / freq_divisor);
+	  if (priority_ll > INT_MAX)
+	    priority = INT_MAX;
+	  else
+	    priority = priority_ll;
+	}
       /* Make recursive inlining happen always after other inlining is done.  */
-      if (cgraph_recursive_inlining_p (edge->caller, edge->callee, NULL))
+      if (cgraph_recursive_inlining_p (edge->caller, edge->callee, NULL)
+	  && priority < INT_MAX)
 	priority += 1;
     }
   gcc_assert (priority >= 0);

@@ -1920,6 +1920,9 @@ vect_enhance_data_refs_alignment (loop_vec_info loop_vinfo)
       tree vectype = STMT_VINFO_VECTYPE (stmt_info);
       int nelements = TYPE_VECTOR_SUBPARTS (vectype);
 
+      if (contains_abnormal_ssa_name_p (LOOP_VINFO_NITERS (loop_vinfo)))
+        return false;
+
       if (known_alignment_for_access_p (dr0))
         {
           /* Since it's known at compile time, compute the number of iterations
@@ -2015,6 +2018,9 @@ vect_enhance_data_refs_alignment (loop_vec_info loop_vinfo)
 
   if (do_versioning)
     {
+      if (contains_abnormal_ssa_name_p (LOOP_VINFO_NITERS (loop_vinfo)))
+        return false;
+
       for (i = 0; VEC_iterate (data_reference_p, datarefs, i, dr); i++)
         {
 	  stmt = DR_STMT (dr);

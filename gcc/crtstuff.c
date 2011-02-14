@@ -173,6 +173,9 @@ typedef void (*func_ptr) (void);
    refer to only the __CTOR_END__ symbol in crtend.o and the __DTOR_LIST__
    symbol in crtbegin.o, where they are defined.  */
 
+/* No need for .ctors/.dtors section if linker can place them in
+   .init_array/.fini_array section.  */
+#ifndef NO_CTORS_DTORS_SECTIONS
 /* The -1 is a flag to __do_global_[cd]tors indicating that this table
    does not start with a count of elements.  */
 #ifdef CTOR_LIST_BEGIN
@@ -203,6 +206,7 @@ STATIC func_ptr __DTOR_LIST__[1]
   __attribute__((section(".dtors"), aligned(sizeof(func_ptr))))
   = { (func_ptr) (-1) };
 #endif /* __DTOR_LIST__ alternatives */
+#endif /* NO_CTORS_DTORS_SECTIONS */
 
 #ifdef USE_EH_FRAME_REGISTRY
 /* Stick a label at the beginning of the frame unwind info so we can register
@@ -466,6 +470,9 @@ __do_global_ctors_1(void)
 
 #elif defined(CRT_END) /* ! CRT_BEGIN */
 
+/* No need for .ctors/.dtors section if linker can place them in
+   .init_array/.fini_array section.  */
+#ifndef NO_CTORS_DTORS_SECTIONS
 /* Put a word containing zero at the end of each of our two lists of function
    addresses.  Note that the words defined here go into the .ctors and .dtors
    sections of the crtend.o file, and since that file is always linked in
@@ -511,6 +518,7 @@ STATIC func_ptr __DTOR_END__[1]
   __attribute__((unused, section(".dtors"), aligned(sizeof(func_ptr))))
   = { (func_ptr) 0 };
 #endif
+#endif /* NO_CTORS_DTORS_SECTIONS */
 
 #ifdef EH_FRAME_SECTION_NAME
 /* Terminate the frame unwind info section with a 4byte 0 as a sentinel;

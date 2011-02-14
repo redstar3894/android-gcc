@@ -20838,6 +20838,10 @@ rs6000_elf_asm_init_sections (void)
   sdata2_section
     = get_unnamed_section (SECTION_WRITE, output_section_asm_op,
 			   SDATA2_SECTION_ASM_OP);
+
+#ifdef NO_CTORS_DTORS_SECTIONS
+  elf_initfini_array_init_sections ();
+#endif
 }
 
 /* Implement TARGET_SELECT_RTX_SECTION.  */

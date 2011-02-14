@@ -156,6 +156,9 @@
 #			Set to an initializer for configure_default_options
 #			in configargs.h, based on --with-cpu et cetera.
 #
+#  use_initfini_array	If set to yes, .init_array/.fini_array sections
+#			will be used if they work.
+#
 #  use_fixproto		Set to "yes" if fixproto should be run normally,
 #			"no" if fixproto should never be run.
 
@@ -199,6 +202,8 @@ need_64bit_hwint=
 # Default to not using fixproto.  Targets which need fixproto should
 # specifically set this to 'yes'.
 use_fixproto=no
+
+use_initfini_array=yes
 
 # Don't carry these over build->host->target.  Please.
 xm_file=
@@ -2654,6 +2659,16 @@ if test x$with_schedule = x; then
 		with_schedule=7100LC
 		;;
 	esac
+fi
+
+# Support --enable-initfini-array.  Use initfini-array.h only if
+# use_initfini_array is also set to yes.  Some platforms don't need it
+# even if enable_initfini_array is yes.
+if test x$enable_initfini_array$use_initfini_array = xyesyes; then
+  tm_file="${tm_file} initfini-array.h"
+  tmake_file="${tmake_file} t-initfini-array"
+  extra_objs="$extra_objs initfini-array.o"
+  target_gtfiles="$target_gtfiles \$(srcdir)/config/initfini-array.c"
 fi
 
 # Validate and mark as valid any --with options supported

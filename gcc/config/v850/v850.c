@@ -2889,6 +2889,10 @@ v850_asm_init_sections (void)
     = get_unnamed_section (SECTION_WRITE | SECTION_BSS,
 			   output_section_asm_op,
 			   "\t.section .zbss,\"aw\"");
+
+#ifdef NO_CTORS_DTORS_SECTIONS
+  elf_initfini_array_init_sections ();
+#endif
 }
 
 static section *

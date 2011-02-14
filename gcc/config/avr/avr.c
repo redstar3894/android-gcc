@@ -4915,6 +4915,9 @@ avr_asm_init_sections (void)
 					 avr_output_progmem_section_asm_op,
 					 NULL);
   readonly_data_section = data_section;
+#ifdef NO_CTORS_DTORS_SECTIONS
+  elf_initfini_array_init_sections ();
+#endif
 }
 
 static unsigned int
